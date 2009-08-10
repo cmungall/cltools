@@ -66,11 +66,13 @@ cltext('$comment'(X,Text)) --> !,clcomment(X),cltext(Text).
 cltext(X) --> axiom([],X).
 
 % quantified sentences
-axiom(BoundList,forall(X,Y)) --> !,varx(all,X),[' '],{append(X,BoundList,NewBoundList)},brac(NewBoundList,Y),dot.
-axiom(BoundList,exists(X,Y)) --> !,varx(exists,X),[' '],{append(X,BoundList,NewBoundList)},brac(NewBoundList,Y),dot.
 axiom(BoundList,X) --> exprs(BoundList,X),dot.
 
 brac(BoundList,X) --> !,['('],exprs(BoundList,X),[')'].
+
+exprs(BoundList,forall(X,Y)) --> !,varx(all,X),[' '],{append(X,BoundList,NewBoundList)},brac(NewBoundList,Y).
+exprs(BoundList,exists(X,Y)) --> !,varx(exists,X),[' '],{append(X,BoundList,NewBoundList)},brac(NewBoundList,Y).
+
 
 exprs(_BoundList,[]) --> !.
 exprs(BoundList,[H|L]) --> !,exprs(BoundList,H),exprs(BoundList,L).
