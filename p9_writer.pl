@@ -21,7 +21,7 @@ export_prover9(Text,Opts) :-
 
 % special code - use hook?
 export_prover9(cltext(L),Opts) :-
-        select(comment(test,Goal),L,L2),
+        select('$comment'(test,Goal),L,L2),
         !,
         export_prover9(cltext(L2),sos,Opts),
         export_prover9(Goal,goals,Opts).
@@ -62,7 +62,7 @@ cltext([H|L]) --> !,cltext(H),cltext(L).
 cltext(module(X,_Y,Text)) --> !,clcomment('Module ~w',[X]),cltext(Text). % TODO
 cltext(cltext(Text)) --> !,cltext(Text).
 cltext(namedtext(X,Text)) --> !,clcomment(X),cltext(Text).
-cltext(comment(X,Text)) --> !,clcomment(X),cltext(Text).
+cltext('$comment'(X,Text)) --> !,clcomment(X),cltext(Text).
 cltext(X) --> axiom([],X).
 
 % quantified sentences
@@ -80,6 +80,7 @@ exprs(BoundList,if(X,Y)) --> !,['('],exprs(BoundList,X),[' -> '],exprs(BoundList
 exprs(BoundList,'='(X,Y)) --> !,['('],exprs(BoundList,X),[' = '],exprs(BoundList,Y),[')'].
 exprs(BoundList,not(X)) --> !,['-'],brac(BoundList,X).
 exprs(BoundList,X) --> {X=..[Op|L],jop(Op)},!,exprj(BoundList,Op,L).
+exprs(BoundList,X) --> {is_list(X),X=[P|L]},!,predsym(P,L),['('],exprj(BoundList,',',L),[')']. % reif
 exprs(BoundList,X) --> {compound(X),X=..[P|L]},!,predsym(P,L),['('],exprj(BoundList,',',L),[')'].
 exprs(BoundList,X) --> {member(X,BoundList),var_p9(X,V)},!,[V].
 exprs(_BoundList,X) --> {safe_atom(X,A)},!,[A].
