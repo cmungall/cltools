@@ -12,22 +12,21 @@ sentence(S) :-
         text_sentence(SL,S).
 text_sentence(cltext(SL),S) :-
         text_sentence(SL,S).
+text_sentence(module(_,_,SL),S) :-
+        text_sentence(SL,S).
 text_sentence(SL,S) :-
         member(S,SL).
 text_sentence(SL,S) :-
-        cltext(SL),
-        member(comment(_,S),SL).
+        member('$comment'(_,S),SL).
 
 % 1 level only
 qsent_prolog(forall(VarSyms,S),forall(Vars,PlTerm)) :-
-        findall(Sym-Var,member(Sym,VarSyms),SymVarMap),
+        findall(Sym-_,member(Sym,VarSyms),SymVarMap),
         symvarmap_vars(SymVarMap,Vars),
         mapsyms(SymVarMap,S,PlTerm).
 
 symvarmap_vars([],[]).
 symvarmap_vars([_-V|L],[V|L2]) :- symvarmap_vars(L,L2).
-
-
 
 mapsyms(_,S,S) :-
         var(S),
@@ -52,24 +51,39 @@ macro_expand(Text,MacroText,Text2) :-
                 (   text_sentence(MacroText,S),
                     qsent_prolog(S,S2)),
                 Macros),
+        %format(user_error,'macros=~w~n',[Macros]),
         findall(S2,
                 (   text_sentence(Text,S),
                     tr(S,Macros,S2)),
                 Text2).
 
 
-tr(comment(X,S),Macros,comment(X,S2)) :-
+tr(S,Macros,S2) :-
+        setof(S2,Macros^tr1(S,Macros,S2),S2s),
         !,
-        tr(S,Macros,S2).
-tr(S,Macros,S2) :-
-        member(Macro,Macros),
-        Macro=forall(_Vars,if(S,S2)),
-        !.
-tr(S,Macros,S2) :-
-        member(Macro,Macros),
-        Macro=forall(_Vars,iff(S,S2)),
-        !.
+        member(S2,S2s).
 tr(S,_,S).
+
+tr1('$comment'(X,S),Macros,'$comment'(X,S2)) :-
+        !,
+        tr1(S,Macros,S2).
+tr1(S,Macros,S2) :-
+        member(Macro,Macros),
+        Macro=forall(_Vars,if(S,S2)).
+tr1(S,Macros,S2) :-
+        member(Macro,Macros),
+        Macro=forall(_Vars,iff(S,S2)).
+%tr(S,Macros,S2) :-
+%        member(Macro,Macros),
+%        Macro=forall(_Vars,iff(If,Then)),
+%        holds(If).
+
+holds(and(X,Y)) :-
+        holds(X),
+        holds(Y).
+holds(X) :-
+        sentence(X).
+
 
 
 
