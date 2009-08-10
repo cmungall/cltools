@@ -8,11 +8,27 @@
 
 main :-
         current_prolog_flag(argv, Arguments),
-        append(_SytemArgs, [--,F|Args], Arguments), !,
+        append(_SytemArgs, [--|Args], Arguments), !,
+        parse_args(Args,Opts),
+        member(macro(F),Opts),
+        (   member(fmt(Fmt),Opts)
+        ->  true
+        ;   Fmt=clif),
         parse_cltext(F,MacroText),
-        forall(member(Arg,Args),
+        forall(member(rest(Arg),Opts),
                (   parse_cltext(Arg,Text),
                    macro_expand(Text,MacroText,Text2),
-                   serialize_cltext(_,clif,Text2))).
+                   serialize_cltext(_,Fmt,Text2))).
 
+
+parse_args([],[]).
+parse_args(Args,[Opt|Opts]) :-
+        parse_arg(Args,Rest,Opt),
+        !,
+        parse_args(Rest,Opts).
+parse_args([A|Args],[rest(A)|Opts]) :-
+        parse_args(Args,Opts).
+
+parse_arg(['-to',Fmt|L],L,fmt(Fmt)).
+parse_arg(['-m',MacroFile|L],L,macro(MacroFile)).
 
