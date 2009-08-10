@@ -62,6 +62,7 @@ user:term_expansion( ( autocode(F)),
 %whitechar --> ['\u000A'].
 %whitechar --> ['\u000C'].
 %whitechar --> ['\u000D'].
+whitechar --> " ".
 whitechar --> "\u0020". % whitechar --> "\u0020". % '0
 whitechar --> "\u0009".
 whitechar --> "\u000A".
@@ -74,16 +75,20 @@ whitechar --> "\u000D".
 %%   '//' {char | open | close | namequote | stringquote | backslash | space | tab }, 
 %% (page | line | return)  ;
 white --> whitechar.
-white --> ["/*"],white_1,opt_asterisk,["*/"].
-white --> ["//"],white_2, (page ; line ; return).
+white --> "/*",zeroOrMore(white_1),opt_asterisk,"*/".
+white --> "//",zeroOrMore(white_2), (page ; line ; return).
 
 white_1 --> char(C),{C\="*"}.
 white_1 --> "*",char(C),{C\="/"}.
-white_1 --> open ; close ; namequote ; stringquote ; backslash ; whitechar.
+white_1 --> open ; close_t ; namequote ; stringquote ; backslash ; whitechar.
 
-white_2 --> char ; open ; close ; namequote ; stringquote ; backslash ; space ; tab.
+white_2 --> char ; open ; close_t ; namequote ; stringquote ; backslash ; space ; ws_tab.
 
-
+space --> " ".
+page --> [12].
+return --> "\n".
+line --> "\r".
+ws_tab --> "\t".
 
 opt_asterisk --> "*".
 opt_asterisk --> [].
@@ -131,6 +136,8 @@ char --> digit ; "~" ; "!" ; "#" ; "$" ; "%" ; "^" ; "&" ; "*" ; "_" ; "+" ; "{"
  ; "N" ; "O" ; "P" ; "Q" ; "R" ; "S" ; "T" ; "U" ; "V" ; "W" ; "X" ; "Y" ; "Z" ; 
  "a" ; "b" ; "c" ; "d" ; "e" ; "f" ; "g" ; "h" ; "i" ; "j" ; "k" ; "l" ; "m" ; "n" 
  ; "o" ; "p" ; "q" ; "r" ; "s" ; "t" ; "u" ; "v" ; "w" ; "x" ; "y" ; "z" .
+%% CJM: allow @ in char
+char --> "@".
 autocode(char).
 
 
@@ -311,7 +318,7 @@ name( N) --> interpretedname( N) ; interpretablename(N).
 %% , term, close ) ; 
 term(T) --> name( T).
 term(T) --> open_tok, operator(OpT), termseq(Ts), close_tok,{T=..[OpT|Ts]}.
-term( comment(C,T) ) --> open_tok, ['cl-comment'], [quotedstring(C)], term(T), close_tok.
+term( '$comment'(C,T) ) --> open_tok, ['cl-comment'], [quotedstring(C)], term(T), close_tok.
 
 %% operator = term  ; 
 operator(Op) --> term(Op).
@@ -387,7 +394,7 @@ boundlist_internal(named(N,T)) --> open_tok, ( interpretablename(N) ; seqmark(N)
 %% commentsent = open_tok, 'cl-comment', quotedstring , sentence , close ; 
 % commentsent(comment(Str,S)) --> open_tok, ['cl-comment'], [quotedstring( Str)], sentence( S), close_tok .
 %% SUGGESTION Dec1 2008: commentsent = open_tok, 'cl-comment', ( quotedstring | enclosedname) , sentence , close ;    
-commentsent(comment(Str,S)) --> open_tok, ['cl-comment'], ( [quotedstring( Str)] ; [enclosedname(Str)] ), sentence( S), close_tok .
+commentsent('$comment'(Str,S)) --> open_tok, ['cl-comment'], ( [quotedstring( Str)] ; [enclosedname(Str)] ), sentence( S), close_tok .
 
 %% A.2.3.10 Module 
 %% Modules are named text segments which represent a text intended to be understood in a ‘local’ context, where 
@@ -414,7 +421,9 @@ module_excludes_opt( []) --> [].
 %% phrase = sentence | module | (open_tok, 'cl-imports' , interpretablename , close) | (open_tok, 'cl-comment', quotedstring, cltext, close);
 phrase(P) --> sentence( P) ; module(P).
 phrase(imports(N)) --> open_tok, ['cl-imports'] , interpretablename( N), close_tok.
-phrase(comment(C,T)) --> open_tok, ['cl-comment'], [quotedstring(C)], cltext(T), close_tok.
+phrase('$comment'(C,T)) --> open_tok, ['cl-comment'], [quotedstring(C)], cltext(T), close_tok.
+%phrase(_,In,_Rest) :- throw(parse('cannot parse phrase: ~w',[In])).
+
 
 %% ORIGINAL: cltext = { phrase }  ; 
 %% CORRIGENDUM: text = { phrase }  ; 
