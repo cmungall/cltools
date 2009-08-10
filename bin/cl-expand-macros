@@ -1,0 +1,18 @@
+#!/usr/bin/swipl -L0 -G0 -A0 -T0 -q -g main -t halt -s
+
+:- use_module(library('cltools/cl')).
+:- use_module(library('cltools/cl_io')).
+:- use_module(library('cltools/clif_parser')).
+:- use_module(library('cltools/p9_writer')).
+
+
+main :-
+        current_prolog_flag(argv, Arguments),
+        append(_SytemArgs, [--,F|Args], Arguments), !,
+        parse_cltext(F,MacroText),
+        forall(member(Arg,Args),
+               (   parse_cltext(Arg,Text),
+                   macro_expand(Text,MacroText,Text2),
+                   serialize_cltext(_,clif,Text2))).
+
+

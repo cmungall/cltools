@@ -1,0 +1,7 @@
+(transitive part_of)
+(reflexive part_of)
+(transitive has_part)
+(reflexive has_part)
+
+(comment 'foo bar'
+         (symmetric adjacent_to))
