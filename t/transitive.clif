@@ -1,9 +1,11 @@
+(cl-comment 'foo'
  (forall (r)
          (iff (transitive r)
               (forall (x y z)
                       (if (and (r x y)
                                (r y z))
                           (r x z)))))
+)
 
  (forall (r)
          (iff (transitive r)
@@ -19,4 +21,13 @@
               (forall (x y z)
                       (if (r x y)
                           (r y x)))))
+
+ (forall (r)
+         (iff (and (symmetric r)
+                   (holds_temporally r))
+              (forall (x y z t)
+                      (if (r x y t)
+                          (r y x t)))))
+
+
 
