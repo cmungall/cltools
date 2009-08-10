@@ -52,7 +52,7 @@ cltext(T,module(X,Y,Text)) --> !,opb('cl-module'),name(X),names(Y),nl,cltext(T+1
 %cltext(T,cltext(Text)) --> !,opb('cl-text'),nl,cltext(T+1,Text),cl(T).
 cltext(T,cltext(Text)) --> !,cltext(T,Text).
 cltext(T,namedtext(X,Text)) --> !,opb('cl-text'),name(X),nl,cltext(T+1,Text),cl(T).
-cltext(T,comment(X,Text)) --> !,opb('cl-comment'),quoted(X),[' '],cltext(T+1,Text),cl(T).
+cltext(T,'$comment'(X,Text)) --> !,opb('cl-comment'),quoted(X),[' '],cltext(T+1,Text),cl(T).
 cltext(T,X) --> clsentence(T,X).
 
 clsentences(_,[]) --> [].
@@ -71,9 +71,9 @@ boolsent(T,X) --> {X=..[Op|L],jop(Op)},!,opb(Op),clsentences(T,L),cl(T).
 
 atomsent(T,X) --> {is_list(X),X=[P|L]},!,opb(P),clterms(L),cl(T). % reif
 atomsent(T,X) --> {compound(X),X=..[P|L]},!,opb(P),clterms(L),cl(T).
-atomsent(_T,X) --> {atom(X)},!,[X].
+atomsent(_T,X) --> {atom(X),safe(X,XS)},!,[XS].
 
-boundlist(L) --> opb,vars(L),cl(T).
+boundlist(L) --> opb,vars(L),cl.
 
 vars([V]) --> [V].
 vars([V|VL]) --> [V],!,[' '],vars(VL).
@@ -88,3 +88,24 @@ names(L) --> vars(L).
 
 quoted(X) --> {sformat(Q,'~q',[X])},[Q].
 
+safe(X,X) :-
+        atom_chars(X,['?'|Chars]),
+        atom_chars(X2,Chars),
+        safe(X2,X2).
+safe(X,X) :-
+        atom_chars(X,Chars),
+        forall(member(C,Chars),
+               (   C='_'
+               ;   (   C @>= 'a', C @=< 'z')
+               ;   (   C @>= 'A', C @=< 'Z')
+               ;   (   C @>= '0', C @=< '9' % '0
+                   )
+               )),
+        !.
+
+safe(X,S) :-
+        %sformat(S,'~q',[X]).
+        sformat(S,'"~w"',[X]). % TODO
+
+               
+               
