@@ -1,0 +1,4 @@
+
+bin/clif-to-prover9 t/part_of.clif | prover9
+
+

@@ -1,0 +1,20 @@
+
+(cl-comment 'axioms'
+         (forall (x) (a x))
+         (forall (?x ?y ?z)
+                 (if (and (part_of ?x ?z)
+                          (part_of ?z ?y))
+                     (part_of ?x ?y)))
+)
+(cl-comment 'facts'
+  (part_of a b)
+  (part_of b c)
+  (part_of foo bar t1)
+)
+(cl-comment 'test'
+            (and (a foo)
+                 (= z z)
+                 (part_of a c)))
+
+
+

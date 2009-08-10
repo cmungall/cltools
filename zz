@@ -1,0 +1,16 @@
+% Automatically generated from CL/KIF
+formulas(sos).
+% axioms
+ all x (a(x)).
+ all x all y all z ((part_of2(x, z) & part_of2(z, y) -> part_of2(x, y))).
+% facts
+part_of2("a", "b").
+part_of2("b", "c").
+part_of3("foo", "bar", "t1").
+
+end_of_list.
+% Automatically generated from CL/KIF
+formulas(goals).
+a("foo") & ("z" = "z") & part_of2("a", "c").
+
+end_of_list.

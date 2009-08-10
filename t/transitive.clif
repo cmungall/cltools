@@ -1,0 +1,7 @@
+
+(forall (r)
+        (if (transitive r)
+            (forall (x y z)
+                    (if (and (r x y)
+                             (r y z))
+                        (r x z)))))
