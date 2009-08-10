@@ -1,7 +1,27 @@
+
+//a
+//b
+//c
+
+(foo "a b c")
+
+(v "0.1")
 (transitive part_of)
 (reflexive part_of)
 (transitive has_part)
 (reflexive has_part)
 
-(comment 'foo bar'
+(comment "foo bar"
          (symmetric adjacent_to))
+(holds_temporally adjacent_to)
+
+(cl-comment 'hi'
+            (cl-comment 'bi'
+                        (foo bar)))
+
+(forall (?x) (foo ?x))
+
+
+(forall (?a ?b)
+        (iff (part_of ?a ?b)
+             (has_part ?b ?a)))
