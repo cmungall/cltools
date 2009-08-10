@@ -1,5 +1,6 @@
 #!/usr/bin/swipl -L0 -G0 -A0 -T0 -q -g main -t halt -s
 
+:- use_module(library('cltools/cl')).
 :- use_module(library('cltools/cl_io')).
 :- use_module(library('cltools/clif_parser')).
 :- use_module(library('cltools/p9_writer')).
@@ -9,8 +10,7 @@ main :-
         current_prolog_flag(argv, Arguments),
         append(_SytemArgs, [--|Args], Arguments), !,
         forall(member(Arg,Args),
-               convert_cltext(Arg,prolog)).
-%        forall(member(Arg,Args),
-%               (   file_to_cltext(Arg,Text),
-%                   export_prover9(Text,[]))).
+               (   parse_cltext(Arg,Text),
+                   writeln(Text))).
+
 
