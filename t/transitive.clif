@@ -1,7 +1,22 @@
+ (forall (r)
+         (iff (transitive r)
+              (forall (x y z)
+                      (if (and (r x y)
+                               (r y z))
+                          (r x z)))))
 
-(forall (r)
-        (if (transitive r)
-            (forall (x y z)
-                    (if (and (r x y)
-                             (r y z))
-                        (r x z)))))
+ (forall (r)
+         (iff (transitive r)
+              (forall (x y z t)
+                      (if (and (r x y t)
+                               (r y z t))
+                          (r x z t)))))
+
+
+
+ (forall (r)
+         (iff (symmetric r)
+              (forall (x y z)
+                      (if (r x y)
+                          (r y x)))))
+
