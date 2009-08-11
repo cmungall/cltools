@@ -2,7 +2,6 @@
 
 :- use_module(library('cltools/cl_io')).
 :- use_module(library('cltools/clif_parser')).
-:- use_module(library('cltools/lp_writer')).
 
 
 main :-
