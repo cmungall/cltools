@@ -12,6 +12,8 @@
 :- use_module(library('thea2/owl2_metamodel')).
 :- use_module(library('thea2/owl2_io')).
 :- use_module(library('thea2/owl2_util')).
+:- use_module(library('thea2/owl2_from_rdf'),[expand_ns/2]).
+
 
 :- multifile cl_io:serialize_cltext_hook/4.
 cl_io:serialize_cltext_hook(File,owl,Text,Opts) :-
@@ -21,6 +23,7 @@ export_owl(File,Text,_Opts) :-
         Prefix='http://example.org#',
         forall(text_sentence(Text,S),
                s2owl(Prefix,S)),
+        expand_namespaces,
         save_axioms(File,owl).
 
 s2owl(Prefix,S) :-
@@ -42,10 +45,14 @@ t2owl(Prefix,[H|L],[H2|L2]) :-
         t2owl(Prefix,H,H2),
         t2owl(Prefix,L,L2).
 
+t2owl(_,literal(S),literal(S)) :- !.
 t2owl(Prefix,S,S2) :-
         atom(S),
         !,
-        atom_concat(Prefix,S,S2).
+        (   expand_ns(S,S2),       % e.g. rdfs:label
+            sub_atom(S2,_,_,_,':') % bit of a hack...
+        ->  true
+        ;   atom_concat(Prefix,S,S2)).
 
 t2owl(Prefix,S,S2) :-
         S=..[P|Args],
