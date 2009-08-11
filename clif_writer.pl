@@ -11,8 +11,7 @@
 
 :- multifile cl_io:serialize_cltext_hook/4.
 cl_io:serialize_cltext_hook(_File,clif,Text,Opts) :-
-        make_variable_arity_predicates_unique(Text,Text2),
-        export_clif(Text2,Opts).
+        export_clif(Text,Opts).
 
 export_clif(Text,Opts) :-
         write_axioms(Text,_,Opts).
