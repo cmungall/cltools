@@ -10,11 +10,21 @@ main :-
         current_prolog_flag(argv, Arguments),
         append(_SytemArgs, [--|Args], Arguments), !,
         parse_args(Args,Opts),
-        member(macro(F),Opts),
         (   member(fmt(Fmt),Opts)
         ->  true
         ;   Fmt=clif),
+        member(macro(F),Opts),
         parse_cltext(F,MacroText),
+        /*
+        findall(S,
+               (   member(macro(F),Opts),
+                   parse_cltext(F,MT),
+                   text_sentence(MT,S)),
+               Ss),
+        %flatten(MTs,MacroText),
+        MacroText=cl(Ss),
+        writeln(mt=MacroText),
+          */
         forall(member(rest(Arg),Opts),
                (   parse_cltext(Arg,Text),
                    macro_expand(Text,MacroText,Text2),
