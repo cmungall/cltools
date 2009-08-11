@@ -4,7 +4,7 @@
 :- module(clif_writer,
           [
            export_clif/2
-           ]).
+          ]).
 
 :- use_module(cl_io).
 :- use_module(cl_transform).
