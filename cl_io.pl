@@ -156,6 +156,8 @@ suffix_format(owlx,owlx).
 format_module(read,clif,clif_parser).
 
 format_module(write,clif,clif_writer).
+format_module(write,prover9,p9_writer).
+format_module(write,owl,owl_writer).
 
 
 /** <module> 
