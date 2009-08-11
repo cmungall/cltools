@@ -2,6 +2,7 @@
           [cltext/1,
            sentence/1,
            text_sentence/2,
+           remove_matching_sentences/3,
            macro_expand/3]).
 
 :- multifile(cltext/1).
@@ -18,6 +19,27 @@ text_sentence(SL,S) :-
         member(S,SL).
 text_sentence(SL,S) :-
         member('$comment'(_,S),SL).
+
+remove_matching_sentences(_,S,S) :-
+        var(S),
+        !.
+remove_matching_sentences(_,S,S) :-
+        atom(S),
+        !.
+remove_matching_sentences(_Templates,[],[]) :- !.
+remove_matching_sentences(Templates,[S|SL],SL2) :- 
+        \+ \+ member(S,Templates),
+        !,
+        remove_matching_sentences(Templates,SL,SL2).
+remove_matching_sentences(Templates,[S|SL],[S2|SL2]) :- 
+        !,
+        remove_matching_sentences(Templates,S,S2),
+        remove_matching_sentences(Templates,SL,SL2).
+remove_matching_sentences(Templates,S,S2) :-
+        S=..L,
+        remove_matching_sentences(Templates,L,L2),
+        S2=..L2.
+
 
 % 1 level only
 qsent_prolog(forall(VarSyms,S),forall(Vars,PlTerm)) :-
