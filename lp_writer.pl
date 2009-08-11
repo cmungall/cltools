@@ -8,6 +8,8 @@
 :- use_module(cl_io).
 
 :- multifile cl_io:serialize_cltext_hook/4.
+cl_io:serialize_cltext_hook(_File,lp,Text,Opts) :-
+        export_logicprogram(Text,Opts).
 cl_io:serialize_cltext_hook(_File,logicprogram,Text,Opts) :-
         export_logicprogram(Text,Opts).
 
@@ -39,11 +41,21 @@ export_logicprogram(Text,_,Opts) :-
 write_comment(A):-
         format('% ~w~n',[A]).
 
-write_lp(A,Toks,_) :-
+write_lp(A,_) :-
         cltext(A,Toks,[]),
         concat_atom(Toks,S),
-        write(S),
-        nl.
+        write(S).
+
+%nd_rewrite(forall(Vars,iff(A,B)),forall(Vars,if(A,B))).
+%nd_rewrite(forall(Vars,iff(A,B)),forall(Vars,if(B,A))).
+nd_rewrite(forall(Vars,iff(A,B)),
+           and(forall(Vars,if(A,B)),forall(Vars,if(B,A)))).
+nd_rewrite(forall(Vars,if(Pre,Post)), R) :-
+        Post=..[and|PostL],
+        findall(forall(Vars,if(Pre,SubPost)),member(SubPost,PostL),ConjL),
+        R=..[and|ConjL].
+nd_rewrite(forall(Vars,if(exists(EVars,A),B)),forall(AllVars,if(A,B))) :-
+        append(Vars,EVars,AllVars).
 
 jop(and).
 jop(or).
@@ -57,33 +69,54 @@ clcomment(X) --> ['% '],{sformat(A,'~q',[X])},[A],nl.  % TODO - newlines
 cltext([]) --> !.
 cltext([H|L]) --> !,cltext(H),cltext(L).
 
-cltext(module(X,_Y,Text)) --> !,clcomment('Module ~w',[X]),cltext(Text). % TODO
 cltext(cltext(Text)) --> !,cltext(Text).
+cltext(module(X,_Y,Text)) --> !,clcomment('Module ~w',[X]),cltext(Text). % TODO
 cltext(namedtext(X,Text)) --> !,clcomment(X),cltext(Text).
-cltext(comment(X,Text)) --> !,clcomment(X),cltext(Text).
-cltext(X) --> axiom([],X).
+cltext('$comment'(X,Text)) --> !,clcomment(X),cltext(Text).
+cltext(X) --> clcomment(X),axiom([],X).
 
-% quantified sentences
-axiom(BoundList,forall(X,Y)) --> !,{append(X,BoundList,NewBoundList)},brac(NewBoundList,Y),dot.
-axiom(BoundList,exists(X,Y)) --> !. % TODO
-axiom(BoundList,X) --> exprs(BoundList,X),dot.
+axiom([],X) --> {\+ \+ nd_rewrite(X,Y),!},{nd_rewrite(X,Y),format(user_error,'rewrite-> ~w',[Y])},cltext(Y).
+
+axiom([],forall(_,if(_,exists(_,_)))) --> !,[].
+
+axiom([],X) --> {X=..[and|L],!},axiom_conjs([],L).
+%axiom([],X) --> {X=..[or|L],!},axiom_disjs([],L). % TODO - disjunctive datalog only
+axiom(_,forall(Vars,if(X,Y))) --> atomic_expr(Vars,Y),[' :- '],exprs(Vars,X),!,dot,nl.
+% axiom(_,forall(Vars,if(X,Y))) --> disj_datalog_head_expr(Vars,Y),[' :- '],exprs(Vars,X),!,dot,nl. % TODO
+axiom(BoundList,X) --> atomic_expr(BoundList,X),!,dot,nl.
+axiom(BoundList,X) --> {format(user_error,'omitting: ~w~n',[X])},[]. 
+
+
+axiom_conjs(_BL,[]) --> !,[].
+axiom_conjs(BL,[A|AL]) --> !,axiom(BL,A),axiom_conjs(BL,AL).
 
 brac(BoundList,X) --> !,['('],exprs(BoundList,X),[')'].
+
+
+% quantified sentences
+exprs(BoundList,forall(Vars,if(X,Y))) --> exprs(BoundList,not(exists(Vars,and(X,not(Y))))),!.
+exprs(BoundList,forall(Vars,iff(X,Y))) --> exprs(BoundList,and(forall(Vars,if(X,Y)),forall(Vars,if(Y,X)))),!.
+exprs(BoundList,forall(X,Y)) --> !,{fail}.
+exprs(BoundList,exists(EVars,X)) --> !,{append(BoundList,EVars,New)},exprs(New,X).
+
+
 
 exprs(_BoundList,[]) --> !.
 exprs(BoundList,[H|L]) --> !,exprs(BoundList,H),exprs(BoundList,L).
 
-exprs(BoundList,iff(X,Y)) --> !,exprs(BoundList,if(X,Y)),exprs(BoundList,if(Y,X)).
-exprs(BoundList,if(X,Y)) --> !,exprs(BoundList,Y),[' :- '],exprs(BoundList,X).
+%exprs(BoundList,iff(X,Y)) --> !,exprs(BoundList,if(X,Y)),exprs(BoundList,if(Y,X)).
+%exprs(BoundList,if(X,Y)) --> !,exprs(BoundList,Y),[' :- '],exprs(BoundList,X).
 exprs(BoundList,'='(X,Y)) --> !,['('],exprs(BoundList,X),[' = '],exprs(BoundList,Y),[')'].
-exprs(BoundList,not(X)) --> !,['\+'],brac(BoundList,X).
+exprs(BoundList,not(X)) --> !,['\\+'],brac(BoundList,X).
 exprs(BoundList,X) --> {X=..[Op|L],jop(Op)},!,exprj(BoundList,Op,L).
-exprs(BoundList,X) --> {compound(X),X=..[P|L]},!,predsym(P,L),['('],exprj(BoundList,',',L),[')'].
+exprs(BoundList,X) --> atomic_expr(BoundList,X).
 exprs(BoundList,X) --> {member(X,BoundList),var_lp(X,V)},!,[V].
 exprs(_BoundList,X) --> {safe_atom(X,A)},!,[A].
 
 exprs(BoundList,[H]) --> !,exprs(BoundList,H).
 exprs(BoundList,[H|T]) --> exprs(BoundList,H),[','],!,exprs(BoundList,T).
+
+atomic_expr(BoundList,X) --> {compound(X),X=..[P|L],P\='=',P\=not,P\='\\+',P\=forall,P\=exists},!,predsym(P,L),['('],exprj(BoundList,',',L),[')'].
 
 varx(Q,L) --> {is_list(L)},!,vars(Q,L).
 varx(Q,X) --> {X=..L},!,vars(Q,L). % vars get parsed as terms..
