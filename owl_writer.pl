@@ -62,6 +62,10 @@ t2owl(Prefix,S,S2) :-
         t2owl(Prefix,Args,Args2),
         S2=..[P|Args2].
 
+% by convention, terms in the owl vocabulary are preceded by
+% the prefix 'owl:' (rather than the full URI).
+% the CL spec is a little unclear on 'network identifiers'.
+% in future we can also translate the full URI.
 cvt_pred(P,P2) :-
         atom_chars(P,[o,w,l,':',C|Rest]),
         downcase_atom(C,C2),
