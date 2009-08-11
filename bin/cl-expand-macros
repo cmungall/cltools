@@ -4,7 +4,6 @@
 :- use_module(library('cltools/cl_io')).
 :- use_module(library('cltools/clif_parser')).
 
-
 main :-
         current_prolog_flag(argv, Arguments),
         append(_SytemArgs, [--|Args], Arguments), !,
@@ -12,18 +11,16 @@ main :-
         (   member(fmt(Fmt),Opts)
         ->  true
         ;   Fmt=clif),
-        member(macro(F),Opts),
-        parse_cltext(F,MacroText),
-        /*
+        %member(macro(F),Opts),
+        %parse_cltext(F,MacroText),
         findall(S,
                (   member(macro(F),Opts),
                    parse_cltext(F,MT),
                    text_sentence(MT,S)),
                Ss),
         %flatten(MTs,MacroText),
-        MacroText=cl(Ss),
-        writeln(mt=MacroText),
-          */
+        MacroText=cltext(Ss),
+        %writeln(mt=MacroText),
         forall(member(rest(Arg),Opts),
                (   parse_cltext(Arg,Text),
                    macro_expand(Text,MacroText,Text2),
