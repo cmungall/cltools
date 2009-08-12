@@ -35,8 +35,7 @@ s2owl(Prefix,S,S2) :-
         S=..[P|Args],
         cvt_pred(P,P2),
         t2owl(Prefix,Args,Args2),
-        S2=..[P2|Args2].
-
+        pred_args_term(P2,Args2,S2).
 
 
 t2owl(_Prefix,[],[]) :- !.
@@ -59,15 +58,27 @@ t2owl(Prefix,S,S2) :-
         cvt_pred(P,P2),
         !,
         t2owl(Prefix,Args,Args2),
-        (   owlpredicate_arguments(P2,[list(_)])
-        ->  S2=..[P2,Args2]
-        ;   S2=..[P2|Args2]).
+        pred_args_term(P2,Args2,S2).
 
 t2owl(Prefix,S,S2) :-
         S=..[P|Args],
         !,
         t2owl(Prefix,Args,Args2),
         S2=..[P|Args2].
+
+pred_args_term(P2,Args2,S2) :-
+        (   pred_args(P2,[Type]),
+            format(user_error,'~w->~w~n',[P2,Type]),
+            (   Type=list(_)
+            ;   Type=set(_))
+        ->  S2=..[P2,Args2]
+        ;   S2=..[P2|Args2]).
+
+
+
+pred_args(P,Args) :- owlpredicate_arguments(P,Args).
+pred_args(P,Args) :- owlpredicate_typed(P,PT),owlpredicate_arguments(PT,Args).
+
 
 % by convention, terms in the owl vocabulary are preceded by
 % the prefix 'owl:' (rather than the full URI).
