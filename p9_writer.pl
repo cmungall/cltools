@@ -74,15 +74,15 @@ exprs(BoundList,forall(X,Y)) --> !,varx(all,X),[' '],{append(X,BoundList,NewBoun
 exprs(BoundList,exists(X,Y)) --> !,varx(exists,X),[' '],{append(X,BoundList,NewBoundList)},brac(NewBoundList,Y).
 
 
+exprs(BoundList,X) --> {is_list(X),X=[P|L]},!,predsym(P,L),['('],exprj(BoundList,',',L),[')']. % reif
 exprs(_BoundList,[]) --> !.
-exprs(BoundList,[H|L]) --> !,exprs(BoundList,H),exprs(BoundList,L).
+%exprs(BoundList,[H|L]) --> !,exprs(BoundList,H),exprs(BoundList,L).
 
 exprs(BoundList,iff(X,Y)) --> !,['('],exprs(BoundList,X),[' <-> '],exprs(BoundList,Y),[')'].
 exprs(BoundList,if(X,Y)) --> !,['('],exprs(BoundList,X),[' -> '],exprs(BoundList,Y),[')'].
 exprs(BoundList,'='(X,Y)) --> !,['('],exprs(BoundList,X),[' = '],exprs(BoundList,Y),[')'].
 exprs(BoundList,not(X)) --> !,['-'],brac(BoundList,X).
 exprs(BoundList,X) --> {X=..[Op|L],jop(Op)},!,exprj(BoundList,Op,L).
-exprs(BoundList,X) --> {is_list(X),X=[P|L]},!,predsym(P,L),['('],exprj(BoundList,',',L),[')']. % reif
 exprs(BoundList,X) --> {compound(X),X=..[P|L]},!,predsym(P,L),['('],exprj(BoundList,',',L),[')'].
 exprs(BoundList,X) --> {member(X,BoundList),var_p9(X,V)},!,[V].
 exprs(_BoundList,X) --> {safe_atom(X,A)},!,[A].
