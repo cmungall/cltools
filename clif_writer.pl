@@ -59,7 +59,7 @@ clsentences(T,[S|SL]) --> clsentence(T,S),!,clsentences(T,SL).
 
 % quantified sentences
 clsentence(T,forall(X,Y)) --> !,next(T),opb(forall),boundlist(X),clsentence(T+1,Y),cl(T).
-clsentence(T,exists(X,Y)) --> !,next(T),opb(forall),boundlist(X),clsentence(T+1,Y),cl(T).
+clsentence(T,exists(X,Y)) --> !,next(T),opb(exists),boundlist(X),clsentence(T+1,Y),cl(T).
 clsentence(T,if(X,Y)) --> !,next(T),opb(if),clsentence(T,X),next(T+1),clsentence(T+1,Y),cl(T).
 clsentence(T,iff(X,Y)) --> !,next(T),opb(iff),clsentence(T,X),nl,clsentence(T+1,Y),cl(T).
 
