@@ -19,12 +19,21 @@ export_prover9(Text,Opts) :-
         export_prover9(Text,sos,Opts2),
         export_prover9(Goal,goals,Opts2).
 
-% special code - use hook?
+% special purpose code - use hook?
 export_prover9(cltext(L),Opts) :-
-        select('$comment'(test,Goal),L,L2),
-        !,
-        export_prover9(cltext(L2),sos,Opts),
-        export_prover9(Goal,goals,Opts).
+	member(test(T),Opts),
+	!,
+        findall(Goal,
+		(   member(Text,L),
+		    goal_is_test(Text,T,Goal)),
+		Goals),
+        findall(Axiom,
+		(   member(Axiom,L),
+		    \+((goal_is_test(Axiom,T2,_),
+			sub_atom(T2,0,_,_,test)))),
+		Axioms),
+        export_prover9(cltext(Axioms),sos,Opts),
+        export_prover9(cltext(Goals),goals,Opts).
 
 export_prover9(Text,Opts) :-
         export_prover9(Text,sos,Opts).
@@ -35,6 +44,9 @@ export_prover9(Text,Stanza,Opts) :-
 	format('formulas(~w).~n',[Stanza]),
         write_axioms(Text,_,Opts),
 	writeln('end_of_list.').
+
+goal_is_test('$comment'(T,Goal),T,Goal).
+
 
 
 

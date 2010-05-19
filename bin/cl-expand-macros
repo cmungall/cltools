@@ -18,14 +18,11 @@ main :-
                    parse_cltext(F,MT),
                    text_sentence(MT,S)),
                Ss),
-        %flatten(MTs,MacroText),
         MacroText=cltext(Ss),
-        %writeln(mt=MacroText),
         forall(member(rest(Arg),Opts),
                (   parse_cltext(Arg,Text),
                    macro_expand(Text,MacroText,Text2),
-                   serialize_cltext(_,Fmt,Text2))).
-
+                   serialize_cltext(_,Fmt,Text2,[]))).
 
 parse_args([],[]).
 parse_args(Args,[Opt|Opts]) :-
@@ -35,6 +32,6 @@ parse_args(Args,[Opt|Opts]) :-
 parse_args([A|Args],[rest(A)|Opts]) :-
         parse_args(Args,Opts).
 
-parse_arg(['-to',Fmt|L],L,fmt(Fmt)).
+parse_arg(['--to',Fmt|L],L,fmt(Fmt)).
 parse_arg(['-m',MacroFile|L],L,macro(MacroFile)).
 

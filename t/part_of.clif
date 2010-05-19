@@ -18,3 +18,19 @@
 
 
 
+(forall (a b)
+ (iff (part_of a b)
+(has_part b a)))
+
+(forall (a b)
+ (if (part_of a b)
+  (and (instance a)(instance b))))
+
+
+(forall (student course)
+        (if (and (enrolled student course)
+                 (forall (exam)
+                         (and (has_exam course exam)
+                              (passed student exam))))
+            (passed_all_exams_in student course)))
+

@@ -68,6 +68,8 @@ mapsyms(Map,S,S2) :-
         ->  S2=L2
         ;   S2=..L2).
 
+%% macro_expand(+Text,+MacroText,?Text2)
+% 
 macro_expand(Text,MacroText,Text2) :-
         findall(S2,
                 (   text_sentence(MacroText,S),

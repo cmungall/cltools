@@ -14,7 +14,6 @@
 :- use_module(library('thea2/owl2_util')).
 :- use_module(library('thea2/owl2_from_rdf'),[expand_ns/2]).
 
-
 :- multifile cl_io:serialize_cltext_hook/4.
 cl_io:serialize_cltext_hook(File,owl,Text,Opts) :-
         export_owl(File,Text,Opts).

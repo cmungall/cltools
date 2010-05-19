@@ -20,7 +20,7 @@
           ]).
 
 :- multifile parse_cltext_hook/4.
-:- multifile store_cltext_hook/3.
+:- multifile serialize_cltext_hook/4.
 
 :- multifile cl:cltext/1.
 :- dynamic cl:cltext/1.
@@ -134,7 +134,7 @@ convert_cltext(FileIn,FmtIn,FileOut,FmtOut,Opts) :-
 
 io_handler(Dir,Fmt) :-
         forall(format_module(Dir,Fmt,Mod),
-               (   atom_concat('clio/',Mod,TMod), % TODO: check for more elegant way to do this..
+               (   atom_concat('cltools/',Mod,TMod), % TODO: check for more elegant way to do this..
                    ensure_loaded(library(TMod)))).
 
 guess_format(File,Fmt,_Opts) :-
