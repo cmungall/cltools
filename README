@@ -17,6 +17,9 @@ Also, if you have the Thea2 library
 (you will first have to define some kind of mapping of your predicates
 to OWL axioms, in CL).
 
+See translating vs embedding:
+http://www.ihmc.us/users/phayes/cl/sw2scl.html
+
 Coming soon:
 
 * generation of HTML from CL
@@ -25,3 +28,4 @@ Coming soon:
 Requirements: SWI-Prolog
 
 Examples: http://code.google.com/p/bfo/source/browse/#svn/trunk/fol
+
