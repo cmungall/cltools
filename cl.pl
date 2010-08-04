@@ -1,5 +1,9 @@
+/* -*- Mode: Prolog -*- */
+
 :- module(cl,
           [cltext/1,
+           assert_cltext/1,
+           clear_cltext/0,
            sentence/1,
            text_sentence/2,
            remove_matching_sentences/3,
@@ -7,6 +11,12 @@
 
 :- multifile(cltext/1).
 :- dynamic(cltext/1).
+
+assert_cltext(T) :-
+        assert(T).
+clear_cltext :-
+        retractall(cltext(_)).
+
 
 sentence(S) :-
         cltext(SL),

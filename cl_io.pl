@@ -80,6 +80,12 @@ parse_cltext(File,Fmt,Text,Opts) :-
 parse_cltext(File,Fmt,Text,Opts) :-
         throw(cl_io('cannot parse fmt for',File,Fmt,Text,Opts)).
 
+consult_cltext(File,Text) :-
+        open(File,read,S,[]),
+        read(S,cltext(Text)),
+        close(S).
+
+
 %% store_cltext(+File,+Fmt)
 % stores cl cltext to File.
 % Fmt = rdf | owlx | prolog | ...
@@ -94,7 +100,7 @@ store_cltext(File,Fmt) :-
 store_cltext(File,Fmt,Opts) :-
         cl:cltext(Text),
         !,
-        store_cltext(File,Fmt,Text,Opts).
+        serialize_cltext(File,Fmt,Text,Opts).
 
 
 %% serialize_cltext(+File,+Fmt,?Text)
@@ -154,6 +160,7 @@ suffix_format(owlx,owlx).
 
 :- multifile format_module/3.
 format_module(read,clif,clif_parser).
+format_module(read,owl,cl_owl2).
 
 format_module(write,clif,clif_writer).
 format_module(write,prover9,p9_writer).

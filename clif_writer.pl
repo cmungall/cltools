@@ -44,7 +44,9 @@ tabs(T+1) --> !,[' '],tabs(T).
 tabs(_) --> [].
 
 cltext(_,[]) --> !.
-cltext(T,[H|L]) --> !,cltext(T,H),cltext(T,L).
+cltext(T,[H|L]) --> cltext(T,H),!,cltext(T,L).
+cltext(_,[H|_]) --> {throw(cannot_translate(H))}.
+
 
 cltext(T,module(X,Y,Text)) --> !,opb('cl-module'),name(X),names(Y),nl,cltext(T+1,Text),cl(T).
 
@@ -70,7 +72,7 @@ boolsent(T,X) --> {X=..[Op|L],jop(Op)},!,opb(Op),clsentences(T,L),cl(T).
 
 atomsent(T,X) --> {is_list(X),X=[P|L]},!,opb(P),clterms(L),cl(T). % reif
 atomsent(T,X) --> {compound(X),X=..[P|L]},!,opb(P),clterms(L),cl(T).
-atomsent(_T,X) --> {atom(X),safe(X,XS)},!,[XS].
+atomsent(_T,X) --> {\+compound(X),safe(X,XS)},!,[XS].
 
 boundlist(L) --> opb,vars(L),cl.
 

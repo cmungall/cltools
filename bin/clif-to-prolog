@@ -1,4 +1,4 @@
-#!/usr/bin/swipl -L0 -G0 -A0 -T0 -q -g main -t halt -s
+#!/usr/bin/swipl -L0 -G0 -T0 -q -g main -t halt -s
 
 :- use_module(library('cltools/cl')).
 :- use_module(library('cltools/cl_io')).
@@ -11,6 +11,6 @@ main :-
         append(_SytemArgs, [--|Args], Arguments), !,
         forall(member(Arg,Args),
                (   parse_cltext(Arg,Text),
-                   writeln(Text))).
+                   serialize_cltext(_,prolog,Text))).
 
 
