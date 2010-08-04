@@ -148,6 +148,8 @@ guess_format(File,Fmt,_Opts) :-
         reverse(Toks,[Suffix,_|_]),
         suffix_format(Suffix,Fmt).
 
+suffix_format(clif,clif).
+suffix_format(clf,clif).
 suffix_format(pro,prolog).
 suffix_format(prolog,prolog).
 suffix_format(pl,prolog).

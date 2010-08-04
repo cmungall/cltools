@@ -13,7 +13,7 @@
 :- dynamic(cltext/1).
 
 assert_cltext(T) :-
-        assert(T).
+        assert(cltext(T)).
 clear_cltext :-
         retractall(cltext(_)).
 
@@ -51,6 +51,7 @@ remove_matching_sentences(Templates,S,S2) :-
         S2=..L2.
 
 
+% quantified sentence to prolog
 % 1 level only
 qsent_prolog(forall(VarSyms,S),forall(Vars,PlTerm)) :-
         findall(Sym-_,member(Sym,VarSyms),SymVarMap),
@@ -85,7 +86,7 @@ macro_expand(Text,MacroText,Text2) :-
                 (   text_sentence(MacroText,S),
                     qsent_prolog(S,S2)),
                 Macros),
-        %format(user_error,'macros=~w~n',[Macros]),
+        format(user_error,'macros=~w~n',[Macros]),
         findall(S2,
                 (   text_sentence(Text,S),
                     tr(S,Macros,S2)),

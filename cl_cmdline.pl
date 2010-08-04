@@ -20,12 +20,11 @@ main :-
                macro_expand_using_file(F,Opts)),
         store_cltext(_,OutFmt).
 
-macro_expand_using_file(F,Opts) :-
+macro_expand_using_file(F,_Opts) :-
         parse_cltext(F,MT),
-        text_sentence(MT,S),
-        MacroText=cltext(S),
+        text_sentence(MT,MacroText),
         cl:cltext(Text),
-        macro_expand(Text,MacroText,Text2),
+        macro_expand(Text,cltext([MacroText]),Text2),
         clear_cltext,
         assert_cltext(Text2).
         
@@ -39,5 +38,5 @@ parse_args([A|Args],[rest(A)|Opts]) :-
 
 parse_arg(['--from',Fmt|L],L,infmt(Fmt)).
 parse_arg(['--to',Fmt|L],L,outfmt(Fmt)).
-parse_arg(['-m',MacroFile|L],L,macro(MacroFile)).
+parse_arg(['--macro-file',MacroFile|L],L,macro(MacroFile)).
 
