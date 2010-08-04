@@ -164,7 +164,7 @@ format_module(read,owl,cl_owl2).
 
 format_module(write,clif,clif_writer).
 format_module(write,prover9,p9_writer).
-format_module(write,owl,owl_writer).
+format_module(write,owl,cl_owl2).
 format_module(write,lp,lp_writer).
 
 

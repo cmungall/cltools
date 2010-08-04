@@ -17,8 +17,8 @@ main :-
                load_cltext(Arg,InFmt)),
         % -- MACRO EXPANSION --
         forall(member(macro(F),Opts),
-               macro_expand_using_file(F<opts)),
-        store_cltext(_,OutFmt))).
+               macro_expand_using_file(F,Opts)),
+        store_cltext(_,OutFmt).
 
 macro_expand_using_file(F,Opts) :-
         parse_cltext(F,MT),
